@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FotoBook</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body.no-scroll {
+      overflow: hidden;
+    }
+    @keyframes pop {
+    0%   { transform: scale(0.5); opacity: 0; }
+    50%  { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+
+  #countdown.show {
+    animation: pop 1s ease-in-out;
+  }
+  </style>
+</head>
+<body class="bg-pink-100 text-center font-sans no-scroll">
+
+<div id="welcome-screen"
+     class="fixed inset-0 bg-center bg-no-repeat bg-contain z-50"
+     style="background-image: url('welcome.png');">
+
+  <a href="camera.html">
+    <img id="start-btn"
+         src="start-btn.png"
+         alt="Start"
+         class="w-[60px] cursor-pointer hover:opacity-80 absolute"
+         style="top: 79%; left: 42%; transform: translate(-50%, -50%);" />
+  </a>
+</div>
+
+</body>
+</html>
