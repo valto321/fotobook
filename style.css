@@ -1,0 +1,28 @@
+#strip img {
+  width: 150px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 12px;
+}
+body.no-scroll {
+  overflow: hidden;
+}
+html, body {
+  height: auto;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.grayscale {
+  filter: grayscale(100%);
+}
+
+#flash {
+  position: fixed;
+  inset: 0;
+  background: white;          /* Change this to any color, e.g. 'yellow' or 'rgba(255,255,255,0.8)' */
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1000;
+  transition: opacity 0.05s ease-out; /* Adjust duration & easing here */
+}
