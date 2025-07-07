@@ -1,0 +1,66 @@
+<!-- strip.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Photo Booth - Strip</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body class="bg-pink-100 text-center font-sans">
+  <h1 class="text-4xl font-bold text-pink-600 mt-8 mb-4">📷 Your Photo Strip</h1>
+
+  <div class="flex flex-col items-center">
+    <div class="overflow-hidden flex justify-center" style="height: 900px;">
+      <div id="strip"
+        class="transform scale-50 origin-top bg-white p-2 border-4 border-pink-300 shadow-lg flex flex-col gap-2 items-center"
+        style="width:600px; height:1800px;">
+      </div>
+    </div>
+
+    <button id="download" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 mt-2">
+      Download Strip
+    </button>
+
+    <button id="back" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 mt-2">
+      Back to Camera
+    </button>
+  </div>
+
+  <script>
+    const strip = document.getElementById("strip");
+    const downloadBtn = document.getElementById("download");
+    const backBtn = document.getElementById("back");
+
+    const photoData = JSON.parse(localStorage.getItem("photoStrip")) || [];
+
+    photoData.forEach((src) => {
+      const img = document.createElement("img");
+      img.src = src;
+      img.className = "w-[550px] mx-auto rounded-xl shadow-md";
+      strip.appendChild(img);
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (photoData.length < 4) {
+        alert("You need 4 photos to download the strip.");
+        return;
+      }
+
+      html2canvas(strip, { scale: 4, useCORS: true }).then((canvas) => {
+        const link = document.createElement("a");
+        link.download = "photo-strip.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    });
+
+    backBtn.addEventListener("click", () => {
+      window.location.href = "camera.html";
+    });
+  </script>
+</body>
+</html>
+<a href="index.html" class="fixed bottom-4 left-4 bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-600 z-50">
+  ⬅ Back to Start
+</a>
