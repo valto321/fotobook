@@ -1,0 +1,135 @@
+<!-- camera.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FotoBook</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body.no-scroll { overflow: hidden; 
+}
+      .grayscale {
+    filter: grayscale(100%);
+  }
+   /* Flash overlay style */
+    #flash {
+      position: fixed;
+      inset: 0;
+      background: white;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1000;
+      transition: opacity 0.3s ease-out;
+    }
+</style>
+</head>
+<body class="bg-pink-100 text-center font-sans no-scroll">
+  <h1 class="text-4xl font-bold text-pink-600 mt-8 mb-4">📸 Take Your Photos</h1>
+<div id="countdown"
+     class="fixed inset-0 flex items-center justify-center text-[120px] text-white font-bold z-50 pointer-events-none">
+</div>
+  <div class="flex justify-center mb-4">
+    <video id="video" autoplay playsinline class="rounded-xl shadow-lg w-128 h-96 scale-x-[-1]"></video>
+  </div>
+
+  <button id="capture" class="bg-pink-500 text-white px-4 py-2 rounded-lg shadow hover:bg-pink-600 mb-4">
+    Take Photo
+  </button>
+
+  <button id="toggle-filter" class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 mb-4">
+  Toggle B&W Filter
+</button>
+
+  <button id="goToStrip" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 mt-4">
+    View Strip
+  </button>
+
+  <div id="flash"></div>
+
+  <script>
+    const video = document.getElementById("video");
+    const captureBtn = document.getElementById("capture");
+    const countdown = document.getElementById("countdown");
+    const goToStripBtn = document.getElementById("goToStrip");
+    const flash = document.getElementById("flash");
+    const filterBtn = document.getElementById("toggle-filter");
+
+
+    let photoData = [];
+    let isGrayscale = false;
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => video.srcObject = stream)
+      .catch(err => alert("Camera access needed."));
+
+ if (filterBtn) {
+      filterBtn.addEventListener("click", () => {
+        isGrayscale = !isGrayscale;
+        video.classList.toggle("grayscale", isGrayscale);
+        console.log("Grayscale toggled:", isGrayscale); // optional debug
+      });
+    }
+
+    captureBtn.addEventListener("click", () => {
+      if (photoData.length >= 4) {
+        alert("You already have 4 photos.");
+        return;
+      }
+
+      let timeLeft = 3;
+      countdown.textContent = timeLeft;
+
+      const interval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          countdown.textContent = timeLeft;
+        } else {
+          clearInterval(interval);
+          countdown.textContent = "";
+
+  // Show the flash:
+          flash.style.opacity = "1";
+
+          // Hide flash after 300ms:
+          setTimeout(() => {
+            flash.style.opacity = "0";
+          }, 300);
+
+          // Capture photo after flash
+          setTimeout(() => {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext("2d");
+
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            if (isGrayscale) {
+              const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              for (let i = 0; i < imageData.data.length; i += 4) {
+                const avg = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
+                imageData.data[i] = avg;
+                imageData.data[i + 1] = avg;
+                imageData.data[i + 2] = avg;
+              }
+              ctx.putImageData(imageData, 0, 0);
+            }
+
+            const imgData = canvas.toDataURL("image/png");
+            photoData.push(imgData);
+            localStorage.setItem("photoStrip", JSON.stringify(photoData));
+          }, 350);
+        }
+      }, 1000);
+    });
+
+    goToStripBtn.addEventListener("click", () => {
+      window.location.href = "strip.html";
+    });
+  </script>
+</body>
+</html>
+<a href="index.html" class="fixed bottom-4 left-4 bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-600 z-50">
+  ⬅ Back to Start
+</a>
